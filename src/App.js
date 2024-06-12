@@ -4,24 +4,24 @@ import { useState, useRef } from "react"
  * simple wrapper for your API requests
  * 
  * IMPORTANT!
- * Do not use your Elai API KEY directly in frontend apps.
+ * Do not use your Elai API KEY directly in frontend apps in production.
  * Use your own API as proxy, handle security properly.
  */
 const request = async ({ method, url, data }) => {
-  try {
-    const response = await fetch('https://apis.elai.io/api/v1/' + url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: data ? JSON.stringify(data) : undefined,
-    })
+  const response = await fetch('https://apis.elai.io/api/v1/' + url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: data ? JSON.stringify(data) : undefined,
+  })
 
-    return await response.json()
-  } catch (error) {
-    console.log('There was an error', error);
-  }
+  const body = await response.json()
+
+  if(response.status !== 200 && body?.message) alert(body.message)
+
+  return body
 }
 
 let peerConnection
@@ -71,7 +71,8 @@ function App() {
     /**
      * Store streamId in localstorage so in case of page reload you can retrieve the same stream that was already initialized
      */
-    let streamId = localStorage.getItem("streamId")
+    const streamId = localStorage.getItem("streamId")
+
     let stream
     if (streamId) {
       // if we have streamId let's retrieve it's data from server

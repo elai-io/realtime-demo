@@ -4,7 +4,7 @@ This is a simple React.js app that shows basic capabilities of Elai Realtime API
 
 ## Getting Started
 
-- Copy or generate your Elai API Key on your [API Settings page](https://app.elai.io/api)
+- Generate your Elai API Key on your [API Settings page](https://app.elai.io/api)
 
 - Copy .env.example to .env Eg. `cp .env.example .env`
 
