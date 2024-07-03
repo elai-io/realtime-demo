@@ -90,9 +90,9 @@ function App() {
         url: 'streams',
         data: {
           // to get a list of supported avatars call this API https://elai.readme.io/reference/avatars-list with realtime=true query param
-          avatarCode: "gia",
+          avatarCode: "vadim",
           // only elevenlabs provider is supported for now. call https://elai.readme.io/reference/voices-list to see a list of supported voices
-          voiceId: "LcfcDJNUP1GQjkzn1xUU",
+          voiceId: "flq6f7yk4E4fJM5XTYuZ",
           voiceProvider: "elevenlabs"
         }
       })
