@@ -8,6 +8,7 @@ import { useState, useRef } from "react"
  * Use your own API as proxy, handle security properly.
  */
 const request = async ({ method, url, data }) => {
+  //const response = await fetch('http://localhost:3001/api/v1/' + url, {
   const response = await fetch('https://apis.elai.io/api/v1/' + url, {
     method,
     headers: {
@@ -134,6 +135,16 @@ function App() {
     }
   }
 
+  const interrupt = async () => {
+    const streamId = localStorage.getItem("streamId")
+    if (streamId) {
+      await request({
+        method: 'DELETE',
+        url: `streams/render/${streamId}`
+      })
+    }
+  }
+
   return (
     <div>
       <header className="App-header">
@@ -145,6 +156,7 @@ function App() {
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={40} />
         <div>
           <button onClick={renderText} >Render Text</button>
+          <button onClick={interrupt} >Interrupt</button>
         </div>
       </header>
     </div>
