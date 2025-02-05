@@ -1,5 +1,8 @@
 import { useState, useRef } from "react"
 
+const AVATAR = 'vadim'
+const VOICE = 'flq6f7yk4E4fJM5XTYuZ'
+
 /**
  * simple wrapper for your API requests
  * 
@@ -91,9 +94,9 @@ function App() {
         url: 'streams',
         data: {
           // to get a list of supported avatars call this API https://elai.readme.io/reference/avatars-list with realtime=true query param
-          avatarCode: "vadim",
+          avatarCode: AVATAR,
           // only elevenlabs provider is supported for now. call https://elai.readme.io/reference/voices-list to see a list of supported voices
-          voiceId: "flq6f7yk4E4fJM5XTYuZ",
+          voiceId: VOICE,
           voiceProvider: "elevenlabs"
         }
       })
