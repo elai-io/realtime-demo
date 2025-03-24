@@ -3,6 +3,8 @@ import { useState, useRef } from "react"
 const AVATAR = 'vadim'
 const VOICE = 'flq6f7yk4E4fJM5XTYuZ'
 
+const STORE_STREAM_ID = process.env.REACT_APP_STORE_STREAM_ID === 'true'
+
 /**
  * simple wrapper for your API requests
  * 
@@ -12,7 +14,7 @@ const VOICE = 'flq6f7yk4E4fJM5XTYuZ'
  */
 const request = async ({ method, url, data }) => {
   //const response = await fetch('http://localhost:3001/api/v1/' + url, {
-  const response = await fetch('https://apis.elai.io/api/v1/' + url, {
+  const response = await fetch((process.env.REACT_APP_API_URL || 'https://apis.elai.io/api/v1/') + url, {
     method,
     headers: {
       Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
@@ -33,6 +35,7 @@ let peerConnection
 function App() {
   const videoRef = useRef(null)
   const [text, setText] = useState('Type text that avatar will say')
+  const [sessionStreamId, setSessionStreamId] = useState(null)
 
   const processOffer = async ({ offer, iceServers, streamId }) => {
     peerConnection = new RTCPeerConnection({ iceTransportPolicy: 'relay', iceServers })
@@ -75,7 +78,8 @@ function App() {
     /**
      * Store streamId in localstorage so in case of page reload you can retrieve the same stream that was already initialized
      */
-    const streamId = localStorage.getItem("streamId")
+    
+    const streamId = STORE_STREAM_ID ? localStorage.getItem("streamId") : sessionStreamId
 
     let stream
     if (streamId) {
@@ -101,12 +105,14 @@ function App() {
         }
       })
       // store new streamId to localstorage so we can reuse it after reload
-      localStorage.setItem("streamId", stream.id)
+      if (STORE_STREAM_ID) localStorage.setItem("streamId", stream.id)
+      else setSessionStreamId(stream.id)
     }
 
     // if for some reason we don't have webRTC data - we would need to start over, remove stream ID 
     if (!stream?.webrtcData) {
-      localStorage.removeItem("streamId")
+      if (STORE_STREAM_ID) localStorage.removeItem("streamId")
+      else setSessionStreamId(null)
       return
     }
 
@@ -117,18 +123,19 @@ function App() {
   const closeStream = async () => {
     videoRef.current.srcObject = null
 
-    const streamId = localStorage.getItem("streamId")
+    const streamId = STORE_STREAM_ID ? localStorage.getItem("streamId") : sessionStreamId
     if (streamId) {
       await request({
         method: 'DELETE',
         url: `streams/${streamId}`,
       })
-      localStorage.removeItem("streamId")
+      if (STORE_STREAM_ID) localStorage.removeItem("streamId")
+      else setSessionStreamId(null)
     }
   }
 
   const renderText = async () => {
-    const streamId = localStorage.getItem("streamId")
+    const streamId = STORE_STREAM_ID ? localStorage.getItem("streamId") : sessionStreamId
     if (streamId) {
       await request({
         method: 'POST',
@@ -139,7 +146,7 @@ function App() {
   }
 
   const interrupt = async () => {
-    const streamId = localStorage.getItem("streamId")
+    const streamId = STORE_STREAM_ID ? localStorage.getItem("streamId") : sessionStreamId
     if (streamId) {
       await request({
         method: 'DELETE',
